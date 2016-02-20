@@ -3,7 +3,7 @@ from time import time
 from random import random
 from pygame.locals import *
 
-screen_size = screen_width, screen_height = 1200, 800
+screen_size = screen_width, screen_height = 1200, 700
 screen = pygame.display.set_mode(screen_size)
 clock = pygame.time.Clock()
 pygame.display.set_caption('Juego Chachidiver')
@@ -40,7 +40,7 @@ def mezclar(color1, color2):
 def poner_texto(cadena, alto):
 	screen.fill((0, 0, 0))
 	pygame.font.init()
-	fuente = pygame.font.Font(None, 50)
+	fuente = pygame.font.SysFont("tlwgtypewriter", 50)
 	dy = alto*len(cadena)/2
 	for ind in range(len(cadena)):
 		texto = fuente.render(cadena[ind], True, (255, 255, 255), (0, 0, 0))
@@ -75,7 +75,37 @@ for ii in range(4):
 					cccc.r, cccc.g, cccc.b = tttt
 					bichos_de_colores[ii][jj][kk].set_at((xx, yy), cccc)
 
-print int((time() - time0)*100)/100.0, 'segundos' 
+print int((time() - time0)*100)/100.0, 'segundos'
+
+def esperar(tiempo):
+	for ii in range(tiempo):
+		for evento in pygame.event.get():
+			if evento.type == pygame.QUIT:
+				exit_game_forever = True
+		clock.tick(200)
+
+def put_image(path, back_color):
+	for ii in range(18):
+		new_img = pygame.image.load(path)
+		n_i_w = new_img.get_rect().width
+		n_i_h = new_img.get_rect().height
+		for xx in range(n_i_w):
+			for yy in range(n_i_h):
+				cc = new_img.get_at((xx, yy))
+				cc.r, cc.g, cc.b = cc.r*ii/17, cc.g*ii/17, cc.b*ii/17
+				new_img.set_at((xx, yy), cc)
+		clock.tick(20)
+		new_color = tuple([back_color[jj]*ii/17 for jj in range(3)])
+		screen.fill(new_color)
+		screen.blit(new_img, new_img.get_rect().move((screen_width - n_i_w)/2, (screen_height - n_i_h)/2))
+		pygame.display.flip()
+	clock.tick(2000)
+	for ii in range(18):
+		clock.tick(20)
+		new_color = tuple([back_color[jj]*(17 - ii)/17 for jj in range(3)])
+		screen.fill(new_color)
+		pygame.display.flip()
+
 
 class Imagen:
 	def __init__(self, file_name):
@@ -184,7 +214,7 @@ class Laberinto:
 		#self.hacer_camino(self.start, False)
 		lista_de_puntos = self.make_exit(self.start, 4)
 		for punto in lista_de_puntos:
-			self.hacer_camino(punto, False, int(self.size[0] + self.size[1]))
+			self.hacer_camino(punto, False, int(self.size[0]*0.7 + self.size[1]*0.7))
 	def dibujar(self, center):
 		dx = self.pared.rect.width
 		dy = self.pared.rect.height
@@ -196,10 +226,6 @@ class Laberinto:
 					self.suelo.poner(screen_width/2 + dx*(ii - center[0] - 0.5), screen_height/2 + dy*(jj - center[1] - 0.5))
 		#bieeeeeen dibujos
 
-
-pygame.display.set_icon(pygame.image.load(camino[:-8] + "bicho_icono.png"))
-bichitos = []
-index = 0
 
 """
 screen.fill((255, 255, 255))
@@ -223,11 +249,27 @@ for ind in range(2):
 
 pygame.display.flip()
 """
-for iii in range(1000):
-	for evento in pygame.event.get():
-		if evento.type == pygame.QUIT:
-			exit_game_forever = True
-	clock.tick(200)
+esperar(300)
+poner_texto(["Inspirado en", '"La Metamorfosis"', "de Kafka"], 50)
+pygame.display.flip()
+esperar(700)
+pygame.display.set_icon(pygame.image.load(camino[:-8] + "bicho_icono.png"))
+bichitos = []
+index = 0
+
+screen.fill((170, 238, 187))
+img_py = Imagen("pygame.png")
+img_py.poner((screen_width - img_py.rect.width)/2, (screen_height - img_py.rect.height)/2)
+pygame.display.flip()
+#put_image(camino[:-8] + "pygame.png", (170, 238, 187))
+esperar(550)
+
+screen.fill((255, 255, 255))
+img_py = Imagen("github.png")
+img_py.poner((screen_width - img_py.rect.width)/2, (screen_height - img_py.rect.height)/2)
+pygame.display.flip()
+#put_image(camino[:-8] + "pygame.png", (170, 238, 187))
+esperar(550)
 
 #Samsa esta en el laberinto:
 pygame.mixer.music.stop()
@@ -285,8 +327,18 @@ while bucle and not exit_game_forever:
 		bichito.dibujar()
 	index += 1
 	#blablabla()
-
 	pygame.display.flip()
 
 
 
+"""
+chachis: tlwgtypewriter, unpilgi, eufm10.
+for font in pygame.font.get_fonts()[:20]:
+	print(font)
+	screen.fill((250, 250, 250))
+	score_font = pygame.font.SysFont(font, 40)
+	score_text = score_font.render(font*3, 1, (0, 0, 0))
+	screen.blit(score_text, (0,0))
+	pygame.display.flip()
+	esperar(500)
+"""
